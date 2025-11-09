@@ -1,0 +1,59 @@
+# Ignore build and cache directories
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+.vscode/
+.idea/
+.vs/
+
+# Ignore compiled source and user settings
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.ipch
+
+# Binary assets generated during packaging
+*.pdb
+*.obj
+*.exe
+*.dll
+*.app
+*.dSYM
+*.icns
+*.lib
+*.exp
+*.ipa
+
+# Unreal local configuration files
+*.log
+*.tlog
+*.user
+*.userprefs
+*.orig
+*.db
+*.opendb
+*.dmp
+
+# Backup and autosave files
+*_Backup/
+*_autosave/
+*.bak
+*.tmp
+*.old
+*.orig
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Keep config defaults
+Config.ini
+!ConfigDefault.ini
