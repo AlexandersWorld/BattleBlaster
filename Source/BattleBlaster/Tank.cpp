@@ -1,9 +1,9 @@
+#include "Tank.h"
 #include "Camera/CameraComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Tank.h"
 
 ATank::ATank()
 {
@@ -17,8 +17,10 @@ ATank::ATank()
 void ATank::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+
+	PlayerController = Cast<APlayerController>(Controller);
+
+	if (PlayerController)
 	{
 		if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer())
 		{
@@ -28,6 +30,8 @@ void ATank::BeginPlay()
 			}
 		}
 	}
+
+	SetPlayerEnabled(false);
 }
 
 
@@ -35,13 +39,12 @@ void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (PlayerController)
 	{
 		FHitResult HitReuslt;
 		PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitReuslt);
 
 		RotateTurret(HitReuslt.ImpactPoint);
-		DrawDebugSphere(GetWorld(), HitReuslt.ImpactPoint, 25.0f, 12, FColor::Red);
 	}
 }
 
@@ -53,6 +56,7 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATank::MoveInput);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ATank::TurnInput);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATank::Fire);
 	}
 }
 
@@ -74,4 +78,31 @@ void ATank::TurnInput(const FInputActionValue& Value)
 	DeltaRotation.Yaw = TurnRate * InputValue * UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
 
 	AddActorLocalRotation(DeltaRotation, true);
+}
+
+void ATank::HandleDestruction()
+{
+	Super::HandleDestruction();
+	
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+	SetPlayerEnabled(false);
+	IsAlive = false;
+}
+
+void ATank::SetPlayerEnabled(bool Enabled)
+{
+	if (PlayerController)
+	{
+		if (Enabled)
+		{
+			EnableInput(PlayerController);
+		}
+		else
+		{
+
+			DisableInput(PlayerController);
+		}
+		PlayerController->bShowMouseCursor = Enabled;
+	}
 }

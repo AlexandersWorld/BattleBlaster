@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-
+#include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Projectile.h"
 
 #include "BasePawn.generated.h"
 
@@ -26,5 +27,24 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* TurrentMesh;
 
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* DeathParticles;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* DeathSound;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCameraShakeBase> DeathCameraShakeClass;
+
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectile> ProjectileClass;
+
+	void HandleDestruction();
+
 	void RotateTurret(FVector LookAtTarget);
+	void Fire();
 };

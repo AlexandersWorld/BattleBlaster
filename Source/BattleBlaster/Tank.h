@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* TurnAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* FireAction;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
@@ -52,4 +55,12 @@ public:
 	void MoveInput(const FInputActionValue& Value);
 
 	void TurnInput(const FInputActionValue& Value);
+
+	void SetPlayerEnabled(bool Enabled);
+
+	void HandleDestruction();
+
+	bool IsAlive = true;
+
+	APlayerController* PlayerController;
 };

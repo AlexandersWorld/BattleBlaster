@@ -1,9 +1,9 @@
 #include "BasePawn.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABasePawn::ABasePawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -14,6 +14,32 @@ ABasePawn::ABasePawn()
 
 	TurrentMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurrentMesh"));
 	TurrentMesh->SetupAttachment(BaseMesh);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(TurrentMesh);
+}
+
+void ABasePawn::HandleDestruction()
+{
+	if (DeathParticles)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathParticles, GetActorLocation(), GetActorRotation());
+	}
+
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
+	}
+
+	if (DeathCameraShakeClass)
+	{
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+		if (PlayerController)
+		{
+			PlayerController->ClientStartCameraShake(DeathCameraShakeClass);
+		}
+	}
 }
 
 void ABasePawn::RotateTurret(FVector LookAtTarget)
@@ -31,4 +57,15 @@ void ABasePawn::RotateTurret(FVector LookAtTarget)
 	TurrentMesh->SetWorldRotation(InterpolatedRotation);
 }
 
+void ABasePawn::Fire()
+{
+	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
 
+	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+
+	if (Projectile)
+	{
+		Projectile->SetOwner(this);
+	}
+}
